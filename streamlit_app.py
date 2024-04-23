@@ -2,39 +2,45 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
+from PIL import Image, ImageDraw
 
-"""
-# Welcome to Streamlit!
+def generate_circle_headshot(image, circle_diameter):
+    # Resize the image to the specified circle diameter
+    image = image.resize((circle_diameter, circle_diameter))
+    
+    # Create a circular mask
+    mask = Image.new("L", (circle_diameter, circle_diameter), 0)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse((0, 0, circle_diameter, circle_diameter), fill=255)
+    
+    # Apply the circular mask to the image
+    circular_image = Image.new("RGBA", (circle_diameter, circle_diameter))
+    circular_image.paste(image, (0, 0), mask)
+    
+    return circular_image
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+def generate_badge_with_headshot(headshot_path, template_path, output_path):
+    # Open the headshot image
+    headshot = Image.open(headshot_path)
+    
+    # Open the template image
+    template = Image.open(template_path)
+    
+    # Specify the position where the circular headshot should be placed on the template
+    headshot_position = (220, 220)  # Example coordinates, adjust as needed
+    
+    # Generate circular headshot
+    circle_diameter = 6400  # Adjust the diameter as needed
+    circular_headshot = generate_circle_headshot(headshot, circle_diameter)
+    
+    # Paste the circular headshot onto the template at the specified position
+    template.paste(circular_headshot, headshot_position, circular_headshot)
+    
+    # Save the resulting badge image
+    template.save(output_path, format="PNG")
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
-
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
-
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
-
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
-
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
-
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+if __name__ == "__main__":
+    headshot_path = "/home/user/python files/IEEE Day app/Headshot/Matt (1).png"  # PNG format
+    output_path = "badge_with_headshot.png"
+    
+    generate_badge_with_headshot(headshot_path, template_path, output_path)
