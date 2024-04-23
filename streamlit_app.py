@@ -42,5 +42,6 @@ def generate_badge_with_headshot(headshot_path, template_path, output_path):
 if __name__ == "__main__":
     headshot_path = "/home/user/python files/IEEE Day app/Headshot/Matt (1).png"  # PNG format
     output_path = "badge_with_headshot.png"
-    
+    template_path = image = st.file_uploader("Selecione a imagem", type=["jpg", "png", "jpeg"])
+
     generate_badge_with_headshot(headshot_path, template_path, output_path)
